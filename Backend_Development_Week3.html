@@ -1,0 +1,227 @@
+from pathlib import Path
+
+html = r'''<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Week 3 - Full Stack Task Manager</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f7fb;color:#222}
+header{background:linear-gradient(135deg,#4f46e5,#06b6d4);color:white;padding:22px;text-align:center}
+.container{max-width:1000px;margin:25px auto;padding:0 15px}
+.card{background:white;border-radius:14px;padding:22px;margin-bottom:20px;box-shadow:0 4px 18px #00000012}
+h1,h2{margin-top:0}
+input,select,button{width:100%;padding:11px;margin:7px 0;border:1px solid #ccd3df;border-radius:8px;font-size:15px}
+button{border:0;background:#4f46e5;color:white;cursor:pointer;font-weight:bold}
+button:hover{opacity:.9}
+.btn-danger{background:#dc2626}.btn-secondary{background:#64748b}
+.hidden{display:none}
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.nav button{width:auto;padding:9px 15px}
+.task{border:1px solid #e1e5eb;border-radius:10px;padding:14px;margin:10px 0;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.task.done h3{text-decoration:line-through;color:#64748b}
+.task-info{flex:1}
+.small{font-size:13px;color:#64748b}
+.preview{max-width:220px;max-height:180px;border-radius:10px;margin-top:10px}
+.badge{display:inline-block;padding:4px 8px;border-radius:12px;background:#e0e7ff;color:#3730a3;font-size:12px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.stat{background:#eef2ff;padding:15px;border-radius:10px;text-align:center}
+@media(max-width:650px){.stats{grid-template-columns:1fr}.task{flex-direction:column;align-items:stretch}}
+</style>
+</head>
+<body>
+
+<header>
+<h1>Week 3 – Full Stack Integration</h1>
+<p>Task Manager Application</p>
+</header>
+
+<div class="container">
+
+<div id="loginPage" class="card">
+<h2>Login</h2>
+<p class="small">Demo authentication for the Week 3 single-file project.</p>
+<input id="username" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+<p id="loginMsg"></p>
+</div>
+
+<div id="app" class="hidden">
+<div class="nav">
+<button onclick="showPage('dashboard')">Dashboard</button>
+<button onclick="showPage('tasks')">Tasks</button>
+<button onclick="showPage('upload')">Image Upload</button>
+<button onclick="logout()" class="btn-danger">Logout</button>
+</div>
+
+<section id="dashboard" class="page card">
+<h2>Dashboard</h2>
+<p>Full Stack Task Manager – Week 3 Project</p>
+<div class="stats">
+<div class="stat"><b id="totalCount">0</b><br>Total Tasks</div>
+<div class="stat"><b id="completedCount">0</b><br>Completed</div>
+<div class="stat"><b id="pendingCount">0</b><br>Pending</div>
+</div>
+</section>
+
+<section id="tasks" class="page card hidden">
+<h2>Task Management (CRUD)</h2>
+<input id="taskTitle" placeholder="Enter task title">
+<select id="taskPriority">
+<option value="Low">Low</option><option value="Medium">Medium</option><option value="High">High</option>
+</select>
+<button onclick="addTask()">Add Task</button>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<select id="filter" onchange="renderTasks()">
+<option value="All">All Tasks</option><option value="Pending">Pending</option><option value="Completed">Completed</option>
+</select>
+<input id="search" oninput="renderTasks()" placeholder="Search tasks">
+</div>
+<div id="taskList"></div>
+</section>
+
+<section id="upload" class="page card hidden">
+<h2>Image Upload Feature</h2>
+<p class="small">Choose an image to preview it. The selected image is stored locally for this demo.</p>
+<input id="imageInput" type="file" accept="image/*" onchange="previewImage(event)">
+<div id="imageBox"></div>
+</section>
+
+<section class="card">
+<h2>Week 3 Features Covered</h2>
+<ul>
+<li>Frontend and backend integration concept</li>
+<li>Authentication/login</li>
+<li>CRUD operations: Create, Read, Update, Delete</li>
+<li>Routing between Dashboard, Tasks and Upload pages</li>
+<li>Task filtering and searching</li>
+<li>Image upload and preview</li>
+<li>State management using browser localStorage</li>
+</ul>
+</section>
+</div>
+</div>
+
+<script>
+let tasks = JSON.parse(localStorage.getItem("week3Tasks") || "[]");
+let loggedIn = localStorage.getItem("week3Login") === "true";
+
+function login(){
+  const u=document.getElementById("username").value.trim();
+  const p=document.getElementById("password").value.trim();
+  const msg=document.getElementById("loginMsg");
+  if(u && p){
+    loggedIn=true;
+    localStorage.setItem("week3Login","true");
+    document.getElementById("loginPage").classList.add("hidden");
+    document.getElementById("app").classList.remove("hidden");
+    showPage("dashboard");
+  }else{
+    msg.textContent="Please enter username and password.";
+    msg.style.color="#dc2626";
+  }
+}
+
+function logout(){
+  loggedIn=false;
+  localStorage.removeItem("week3Login");
+  document.getElementById("app").classList.add("hidden");
+  document.getElementById("loginPage").classList.remove("hidden");
+}
+
+function showPage(id){
+  document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+  if(id==="tasks") renderTasks();
+  updateStats();
+}
+
+function save(){localStorage.setItem("week3Tasks",JSON.stringify(tasks));}
+
+function addTask(){
+  const title=document.getElementById("taskTitle").value.trim();
+  const priority=document.getElementById("taskPriority").value;
+  if(!title){alert("Enter a task title.");return;}
+  tasks.push({id:Date.now(),title,priority,done:false});
+  document.getElementById("taskTitle").value="";
+  save();renderTasks();updateStats();
+}
+
+function toggleTask(id){
+  tasks=tasks.map(t=>t.id===id?{...t,done:!t.done}:t);
+  save();renderTasks();updateStats();
+}
+
+function editTask(id){
+  const t=tasks.find(x=>x.id===id);
+  const newTitle=prompt("Edit task title:",t.title);
+  if(newTitle && newTitle.trim()){
+    t.title=newTitle.trim();save();renderTasks();
+  }
+}
+
+function deleteTask(id){
+  if(confirm("Delete this task?")){
+    tasks=tasks.filter(t=>t.id!==id);
+    save();renderTasks();updateStats();
+  }
+}
+
+function renderTasks(){
+  const list=document.getElementById("taskList");
+  const filter=document.getElementById("filter").value;
+  const search=document.getElementById("search").value.toLowerCase();
+  let data=tasks.filter(t=>{
+    const status=filter==="All" || (filter==="Completed"&&t.done) || (filter==="Pending"&&!t.done);
+    return status && t.title.toLowerCase().includes(search);
+  });
+  list.innerHTML=data.length ? data.map(t=>`
+    <div class="task ${t.done?'done':''}">
+      <div class="task-info">
+        <h3>${escapeHTML(t.title)}</h3>
+        <span class="badge">${t.priority}</span>
+        <p class="small">${t.done?'Completed':'Pending'}</p>
+      </div>
+      <button onclick="toggleTask(${t.id})">${t.done?'Undo':'Complete'}</button>
+      <button class="btn-secondary" onclick="editTask(${t.id})">Edit</button>
+      <button class="btn-danger" onclick="deleteTask(${t.id})">Delete</button>
+    </div>`).join("") : "<p>No tasks found.</p>";
+}
+
+function updateStats(){
+  document.getElementById("totalCount").textContent=tasks.length;
+  document.getElementById("completedCount").textContent=tasks.filter(t=>t.done).length;
+  document.getElementById("pendingCount").textContent=tasks.filter(t=>!t.done).length;
+}
+
+function previewImage(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  if(!file.type.startsWith("image/")){alert("Please select an image.");return;}
+  const reader=new FileReader();
+  reader.onload=()=>document.getElementById("imageBox").innerHTML=
+    `<p><b>Uploaded image preview:</b></p><img class="preview" src="${reader.result}" alt="Uploaded image">`;
+  reader.readAsDataURL(file);
+}
+
+function escapeHTML(s){
+  return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+
+if(loggedIn){
+  document.getElementById("loginPage").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+}
+updateStats();
+</script>
+</body>
+</html>
+'''
+
+path = Path("/mnt/data/Backend_Development_Week3.html")
+path.write_text(html, encoding="utf-8")
+print(f"Created: {path}")
