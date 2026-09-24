@@ -1,0 +1,98 @@
+from pathlib import Path
+
+html = """<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backend Development Week 2 - Assignment & Project</title>
+<style>
+body{font-family:Arial,sans-serif;line-height:1.6;background:#f4f6f8;margin:0;color:#222}
+.container{max-width:900px;margin:30px auto;background:white;padding:35px;border-radius:12px}
+h1{text-align:center;color:#1f4e79} h2{color:#2f6f9f;border-bottom:2px solid #ddd;padding-bottom:6px}
+.box{background:#f7f9fb;padding:15px;border-left:4px solid #2f6f9f;margin:15px 0}
+table{width:100%;border-collapse:collapse;margin:15px 0} th,td{border:1px solid #ccc;padding:10px;text-align:left} th{background:#e8f0f7}
+pre{background:#f1f1f1;padding:12px;border-radius:6px;overflow:auto}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Backend Development – Week 2</h1>
+<p style="text-align:center"><strong>Assignment & Mini Project</strong></p>
+
+<div class="box"><strong>Technologies:</strong> Node.js, Express.js, MongoDB, Mongoose, REST API, JWT and bcrypt.</div>
+
+<h2>Topics Covered</h2>
+<ul>
+<li>Node.js basics and NPM setup</li>
+<li>Express.js framework and routing</li>
+<li>MongoDB and Mongoose for database management</li>
+<li>REST API design principles</li>
+<li>Authentication using JWT and bcrypt</li>
+</ul>
+
+<h2>Assignment 1: To-Do List REST API</h2>
+<p>The To-Do List REST API manages tasks by supporting create, read, update and delete operations.</p>
+<table>
+<tr><th>Method</th><th>Endpoint</th><th>Purpose</th></tr>
+<tr><td>POST</td><td>/api/tasks</td><td>Add a task</td></tr>
+<tr><td>GET</td><td>/api/tasks</td><td>View tasks</td></tr>
+<tr><td>PUT</td><td>/api/tasks/:id</td><td>Update a task</td></tr>
+<tr><td>DELETE</td><td>/api/tasks/:id</td><td>Delete a task</td></tr>
+</table>
+<pre>{
+  "title": "Complete assignment",
+  "description": "Test the REST API",
+  "completed": false
+}</pre>
+<p>Tasks are stored in MongoDB and can be tested using Postman.</p>
+
+<h2>Assignment 2: User Authentication API</h2>
+<p>This API provides secure user registration and login.</p>
+<ul>
+<li>User registration</li><li>User login</li><li>Password encryption using bcrypt</li>
+<li>JWT token generation</li><li>Protected API routes</li>
+</ul>
+<table>
+<tr><th>Method</th><th>Endpoint</th><th>Purpose</th></tr>
+<tr><td>POST</td><td>/api/auth/register</td><td>Register a user</td></tr>
+<tr><td>POST</td><td>/api/auth/login</td><td>Login and receive JWT</td></tr>
+</table>
+<pre>{
+  "name": "Manya",
+  "email": "manya@example.com",
+  "password": "password123"
+}</pre>
+
+<h2>Mini Project: Notes App Backend</h2>
+<p>The Notes App Backend is a REST API for creating and managing personal notes.</p>
+<ul>
+<li>Create notes</li><li>View all notes</li><li>View a single note</li>
+<li>Update notes</li><li>Delete notes</li><li>MongoDB database storage</li>
+<li>JWT authentication for secure routes</li>
+</ul>
+<table>
+<tr><th>Method</th><th>Endpoint</th><th>Purpose</th></tr>
+<tr><td>POST</td><td>/api/notes</td><td>Create a note</td></tr>
+<tr><td>GET</td><td>/api/notes</td><td>View all notes</td></tr>
+<tr><td>GET</td><td>/api/notes/:id</td><td>View one note</td></tr>
+<tr><td>PUT</td><td>/api/notes/:id</td><td>Update a note</td></tr>
+<tr><td>DELETE</td><td>/api/notes/:id</td><td>Delete a note</td></tr>
+</table>
+<pre>{
+  "title": "College Notes",
+  "content": "Backend development using Node.js and MongoDB."
+}</pre>
+
+<h2>Learning Outcome</h2>
+<p>Students learn backend logic, database integration, REST API creation, authentication and CRUD operations for real-world applications.</p>
+
+<h2>Conclusion</h2>
+<p>This Week 2 project demonstrates Node.js, Express.js, MongoDB, REST APIs and JWT authentication.</p>
+</div>
+</body>
+</html>"""
+
+path = Path("/mnt/data/Backend_Development_Week2_Assignment_and_Project.html")
+path.write_text(html, encoding="utf-8")
+print("Created:", path)
